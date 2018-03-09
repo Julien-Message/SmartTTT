@@ -1,8 +1,12 @@
 from flask import Flask
 from flask_sockets import Sockets
 
+from game import Game
+
 app = Flask(__name__)
 sockets = Sockets(app)
+
+game = Game()
 
 
 @sockets.route('/echo')
@@ -14,12 +18,13 @@ def echo_socket(ws):
 
 @app.route('/')
 def hello():
-    return 'Hello World!'
+    return str(game)
 
 
 if __name__ == "__main__":
     from gevent import pywsgi
     from geventwebsocket.handler import WebSocketHandler
+
     print("Serving Server on port 5000")
     try:
         server = pywsgi.WSGIServer(
