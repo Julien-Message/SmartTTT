@@ -1,12 +1,12 @@
+from random import random
+
 from flask import Flask
 from flask_sockets import Sockets
 
-from game import Game
+from game import Game, Result
 
 app = Flask(__name__)
 sockets = Sockets(app)
-
-game = Game()
 
 
 @sockets.route('/echo')
@@ -18,7 +18,24 @@ def echo_socket(ws):
 
 @app.route('/')
 def hello():
-    return str(game)
+    print("begin")
+    end = False
+    game = Game()
+    while not end:
+        i = int(random() * 9)
+        player = game.currentPlayer
+        result = game.play(i)
+        if result[0] == Result.NEXT_MOVE:
+            print(player, i)
+        elif result[0] == Result.WON:
+            print(player, "played", i, "and won with line", result)
+            end = True
+        elif result[0] == Result.NON_PLAYABLE:
+            pass
+        else:
+            print("Draw")
+            end = True
+    return ""
 
 
 if __name__ == "__main__":

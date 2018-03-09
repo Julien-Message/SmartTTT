@@ -25,9 +25,9 @@ class Game:
                       [Tile.BLANK, Tile.BLANK, Tile.BLANK]]
         self.currentPlayer = Player.CROSS
 
-    def play(self, x, y):
+    def play(self, x, y=None):
         if y is None:
-            x, y = x % 3, x / 3
+            x, y = x % 3, int(x / 3)
 
         if self.board[x][y] != Tile.BLANK:
             return Result.NON_PLAYABLE, []
@@ -39,7 +39,10 @@ class Game:
         if len(result) > 0:
             return Result.WON, result
         else:
-            self.currentPlayer = 3 - self.currentPlayer  # 2 => 1; 1 => 2
+            if self.currentPlayer == Player.CROSS:
+                self.currentPlayer = Player.CIRCLE
+            else:
+                self.currentPlayer = Player.CROSS
             return Result.NEXT_MOVE, []
 
     def has_won(self, x, y):
