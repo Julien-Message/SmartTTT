@@ -30,7 +30,7 @@ def hello():
             i = int(random() * len(possible_moves))
             step = possible_moves[i]
             player = game.currentPlayer
-            result = game.play(step)
+            result = game.play(step[0], step[1])
             if result[0] == Result.NEXT_MOVE:
                 print(player, step)
             elif result[0] == Result.WON:

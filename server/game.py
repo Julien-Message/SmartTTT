@@ -15,7 +15,8 @@ class Player(Enum):
 class Result(Enum):
     NON_PLAYABLE = 0
     NEXT_MOVE = 1
-    WON = 2
+    DRAW = 2
+    WON = 3
 
 
 class Game:
@@ -24,6 +25,7 @@ class Game:
                       [Tile.BLANK, Tile.BLANK, Tile.BLANK],
                       [Tile.BLANK, Tile.BLANK, Tile.BLANK]]
         self.currentPlayer = Player.CROSS
+        self.possible_moves = [(i, j) for i in range(3) for j in range(3)]
 
     def play(self, x, y=None):
         if y is None:
@@ -33,6 +35,7 @@ class Game:
             return Result.NON_PLAYABLE, []
 
         self.board[x][y] = self.currentPlayer
+        self.possible_moves.remove((x, y))
 
         result = self.has_won(x, y)
 
@@ -78,5 +81,4 @@ class Game:
         return winning_lines
 
     def get_possible_moves(self):
-        result = [3 * j + i for j in range(3) for i in range(3) if self.board[i][j] == Tile.BLANK]
-        return result
+        return self.possible_moves
