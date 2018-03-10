@@ -76,3 +76,7 @@ class Game:
             winning_lines.append([(0, y), (1, y), (2, y)])
 
         return winning_lines
+
+    def get_possible_moves(self):
+        result = [3 * j + i for j in range(3) for i in range(3) if self.board[i][j] == Tile.BLANK]
+        return result

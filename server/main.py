@@ -22,19 +22,21 @@ def hello():
     end = False
     game = Game()
     while not end:
-        i = int(random() * 9)
-        player = game.currentPlayer
-        result = game.play(i)
-        if result[0] == Result.NEXT_MOVE:
-            print(player, i)
-        elif result[0] == Result.WON:
-            print(player, "played", i, "and won with line", result)
-            end = True
-        elif result[0] == Result.NON_PLAYABLE:
-            pass
-        else:
+        possible_moves = game.get_possible_moves()
+        if len(possible_moves) == 0:
             print("Draw")
             end = True
+        else:
+            i = int(random() * len(possible_moves))
+            step = possible_moves[i]
+            player = game.currentPlayer
+            result = game.play(step)
+            if result[0] == Result.NEXT_MOVE:
+                print(player, step)
+            elif result[0] == Result.WON:
+                print(player, "played", step, "and won with line", result[1])
+                end = True
+
     return ""
 
 
