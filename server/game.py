@@ -1,4 +1,5 @@
 from enum import Enum
+from random import random
 
 
 class Tile(Enum):
@@ -82,3 +83,11 @@ class Game:
 
     def get_possible_moves(self):
         return self.possible_moves
+
+    @staticmethod
+    def random_player():
+        i = int(random() * 2 + 1)
+        if i == 1:
+            return Player.CROSS
+        else:
+            return Player.CIRCLE
