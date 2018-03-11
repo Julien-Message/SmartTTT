@@ -2,14 +2,13 @@ from random import random
 
 from flask import Flask
 from flask_sockets import Sockets
-
 from game import Game, Result
 
 app = Flask(__name__)
 sockets = Sockets(app)
 
 
-@sockets.route('/echo')
+@sockets.route('/')
 def echo_socket(ws):
     while not ws.closed:
         message = ws.receive()
