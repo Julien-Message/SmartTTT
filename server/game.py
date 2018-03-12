@@ -30,7 +30,7 @@ class Game:
 
     def play(self, x, y=None):
         if y is None:
-            x, y = x % 3, int(x / 3)
+            x, y = int(x / 3), x % 3
 
         if self.board[x][y] != Tile.BLANK:
             return Result.NON_PLAYABLE, []

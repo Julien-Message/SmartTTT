@@ -1,3 +1,4 @@
+import json
 from random import random
 
 from flask import Flask
@@ -8,28 +9,31 @@ app = Flask(__name__)
 sockets = Sockets(app)
 
 
-@sockets.route('/')
+@sockets.route('/new-game')
 def game_socket(ws):
-    game = None
+    game = Game()
+    print("New Game")
+    player_is = Game.random_player()
+    if player_is == Player.CIRCLE:
+        _, _, result = playGame(game)
+    ws.send(generateMessage(Result.NON_PLAYABLE, game.board))
     while not ws.closed:
         message = ws.receive()
         print(message)
-        if game is None and message == "new":
-            game = Game()
-            print("New Game")
-            player_is = Game.random_player()
-            if player_is == Player.CIRCLE:
-                _, _, result = playGame(game)
-            ws.send(str(game.board))
-        elif game is not None:
-            try:
-                move = int(message)
-                print("moving", move)
-                game.play(move)
+        try:
+            move = int(message)
+            print("moving", move)
+            result, lines = game.play(move)
+            if result == Result.NEXT_MOVE:
                 playGame(game)
-                ws.send(str(game.board))
-            except Exception:
-                pass
+            ws.send(generateMessage(result, game.board))
+        except Exception:
+            pass
+
+
+def generateMessage(result, board):
+    array = [board[i][j].name.lower() for i in range(3) for j in range(3)]
+    return json.dumps({'result': result.name.lower(), 'board': array})
 
 
 def playGame(game):
@@ -38,27 +42,6 @@ def playGame(game):
     step = possible_moves[i]
     player = game.currentPlayer
     return step, player, game.play(step[0], step[1])
-
-
-@app.route('/')
-def hello():
-    print("begin")
-    end = False
-    game = Game()
-    while not end:
-        possible_moves = game.get_possible_moves()
-        if len(possible_moves) == 0:
-            print("Draw")
-            end = True
-        else:
-            step, player, result = playGame(game)
-            if result[0] == Result.NEXT_MOVE:
-                print(player, step)
-            elif result[0] == Result.WON:
-                print(player, "played", step, "and won with line", result[1])
-                end = True
-
-    return ""
 
 
 if __name__ == "__main__":
