@@ -9,26 +9,29 @@ app = Flask(__name__)
 sockets = Sockets(app)
 
 
-@sockets.route('/new-game')
+@sockets.route('/game')
 def game_socket(ws):
-    game = Game()
-    print("New Game")
-    player_is = Game.random_player()
-    if player_is == Player.CIRCLE:
-        _, _, result = playGame(game)
-    ws.send(generateMessage(Result.NON_PLAYABLE, game.board))
+    game = None
     while not ws.closed:
         message = ws.receive()
         print(message)
-        try:
-            move = int(message)
-            print("moving", move)
-            result, lines = game.play(move)
-            if result == Result.NEXT_MOVE:
-                playGame(game)
-            ws.send(generateMessage(result, game.board))
-        except Exception:
-            pass
+        if message == "new":
+            game = Game()
+            print("New Game")
+            player_is = Game.random_player()
+            if player_is == Player.CIRCLE:
+                _, _, result = playGame(game)
+            ws.send(generateMessage(Result.NON_PLAYABLE, game.board))
+        elif game is not None:
+            try:
+                move = int(message)
+                print("moving", move)
+                result, lines = game.play(move)
+                if result == Result.NEXT_MOVE:
+                    playGame(game)
+                ws.send(generateMessage(result, game.board))
+            except Exception:
+                pass
 
 
 def generateMessage(result, board):

@@ -1,22 +1,24 @@
-let ws = new WebSocket("ws://localhost:5000/new-game");
+let ws = new WebSocket("ws://localhost:5000/game");
 
 const list = document.getElementsByClassName("tile");
 for (let element of list) {
-	element.addEventListener("click", () => ws.send(element.id.toString()));
+	element.addEventListener("click", () => {if (!finished) {ws.send(element.id.toString())}});
 }
 
 ws.onopen = function (event) {
-    console.log("open")
     ws.send("new");
+    finished = false
 };
 
 ws.onmessage = function (event) {
 	data = JSON.parse(event.data);
     console.log("message " + data)
 	for (i = 0; i < 9; i++) {
-		console.log(i)
-		console.log(data["board"])
 		document.getElementById(i.toString()).innerHTML = ox(data["board"][i])
+	}
+	if (data.result == "won") {
+		finished = true
+		document.getElementById("status").innerHTML = "Partie finie"
 	}
 };
 
