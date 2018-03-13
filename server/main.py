@@ -35,7 +35,7 @@ def game_socket(ws):
 
 
 def generateMessage(result, board):
-    array = [board[i][j].name.lower() for i in range(3) for j in range(3)]
+    array = [board[i].name.lower() for i in range(9)]
     return json.dumps({'result': result.name.lower(), 'board': array})
 
 
@@ -44,7 +44,7 @@ def playGame(game):
     i = int(random() * len(possible_moves))
     step = possible_moves[i]
     player = game.currentPlayer
-    return step, player, game.play(step[0], step[1])
+    return step, player, game.play(step)
 
 
 if __name__ == "__main__":

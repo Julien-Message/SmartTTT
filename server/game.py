@@ -22,23 +22,23 @@ class Result(Enum):
 
 class Game:
     def __init__(self) -> None:
-        self.board = [[Tile.BLANK, Tile.BLANK, Tile.BLANK],
-                      [Tile.BLANK, Tile.BLANK, Tile.BLANK],
-                      [Tile.BLANK, Tile.BLANK, Tile.BLANK]]
+        self.board = [Tile.BLANK, Tile.BLANK, Tile.BLANK,
+                      Tile.BLANK, Tile.BLANK, Tile.BLANK,
+                      Tile.BLANK, Tile.BLANK, Tile.BLANK]
         self.currentPlayer = Player.CROSS
-        self.possible_moves = [(i, j) for i in range(3) for j in range(3)]
+        self.possible_moves = [i for i in range(9)]
+        self.moves = []
 
-    def play(self, x, y=None):
-        if y is None:
-            x, y = int(x / 3), x % 3
+    def play(self, x):
 
-        if self.board[x][y] != Tile.BLANK:
+        if self.board[x] != Tile.BLANK:
             return Result.NON_PLAYABLE, []
 
-        self.board[x][y] = self.currentPlayer
-        self.possible_moves.remove((x, y))
+        self.board[x] = self.currentPlayer
+        self.possible_moves.remove(x)
+        self.moves += [x]
 
-        result = self.has_won(x, y)
+        result = self.has_won(x)
 
         if len(result) > 0:
             return Result.WON, result
@@ -49,35 +49,30 @@ class Game:
                 self.currentPlayer = Player.CROSS
             return Result.NEXT_MOVE, []
 
-    def has_won(self, x, y):
+    diagonal1 = [0, 4, 8]
+    diagonal2 = [2, 4, 6]
+
+    def has_won(self, x):
+        x_line = [x - (x % 3) + i for i in range(3)]
+        x_column = [x % 3 + 3 * i for i in range(3)]
+
+        player_line = [self.currentPlayer,
+                       self.currentPlayer,
+                       self.currentPlayer]
+
         winning_lines = []
-        if x == y and [self.board[0][0],
-                       self.board[1][1],
-                       self.board[2][2]] == [self.currentPlayer,
-                                             self.currentPlayer,
-                                             self.currentPlayer]:
-            winning_lines.append([(0, 0), (1, 1), (2, 2)])
 
-        if x + y == 2 and [self.board[0][2],
-                           self.board[1][1],
-                           self.board[2][0]] == [self.currentPlayer,
-                                                 self.currentPlayer,
-                                                 self.currentPlayer]:
-            winning_lines.append([(0, 2), (1, 1), (2, 0)])
+        if x in Game.diagonal1 and [self.board[i] for i in Game.diagonal1] == player_line:
+            winning_lines.append(Game.diagonal1)
 
-        if [self.board[x][0],
-            self.board[x][1],
-            self.board[x][2]] == [self.currentPlayer,
-                                  self.currentPlayer,
-                                  self.currentPlayer]:
-            winning_lines.append([(x, 0), (x, 1), (x, 2)])
+        if x in Game.diagonal2 and [self.board[i] for i in Game.diagonal2] == player_line:
+            winning_lines.append(Game.diagonal2)
 
-        if [self.board[0][y],
-            self.board[1][y],
-            self.board[2][y]] == [self.currentPlayer,
-                                  self.currentPlayer,
-                                  self.currentPlayer]:
-            winning_lines.append([(0, y), (1, y), (2, y)])
+        if [self.board[i] for i in x_line] == player_line:
+            winning_lines.append(x_line)
+
+        if [self.board[i] for i in x_column] == player_line:
+            winning_lines.append(x_column)
 
         return winning_lines
 
