@@ -2,16 +2,38 @@
 	background-color: lightblue;
 	color: blue;
 	text-align: center;
-	display: inline-block;
-    vertical-align: middle;
-	padding: 1em;
-	margin:1px;
-	border-style: solid;
-    border-width: 5px;
-	font-family: "helvetica";
-	font-size: 32;
-	width: 5em;
-	height: 5em;
+	alignment-baseline: center;
+	line-height:200px;
+	font-family: "Comic Sans MS";
+	font-size: 100px;
+	width: 200px;
+	height: 200px;
+	float: left;
 }
 
+.row {
+	clear: left;
+    height: 0;
+}
 
+.top .tile {
+	border-bottom: 5px solid blue;
+}
+.middle .tile {
+	border-bottom: 5px solid blue;
+	border-top: 5px solid blue;
+}
+.bottom .tile {
+	border-top: 5px solid blue;
+}
+
+.tile.left {
+	border-right: 5px solid blue;
+}
+.tile.middle {
+	border-right: 5px solid blue;
+	border-left: 5px solid blue;
+}
+.tile.right {
+	border-left: 5px solid blue;
+}
