@@ -8,11 +8,6 @@ class Tile(Enum):
     CIRCLE = 2
 
 
-class Player(Enum):
-    CROSS = 1
-    CIRCLE = 2
-
-
 class Result(Enum):
     NON_PLAYABLE = 0
     NEXT_MOVE = 1
@@ -25,9 +20,10 @@ class Game:
         self.board = [Tile.BLANK, Tile.BLANK, Tile.BLANK,
                       Tile.BLANK, Tile.BLANK, Tile.BLANK,
                       Tile.BLANK, Tile.BLANK, Tile.BLANK]
-        self.currentPlayer = Player.CROSS
+        self.currentPlayer = Tile.CROSS
         self.possible_moves = [i for i in range(9)]
         self.moves = []
+        self.finished = False
 
     def play(self, x):
 
@@ -41,12 +37,16 @@ class Game:
         result = self.has_won(x)
 
         if len(result) > 0:
+            self.finished = True
             return Result.WON, result
+        elif not self.possible_moves:
+            self.finished = True
+            return Result.DRAW, []
         else:
-            if self.currentPlayer == Player.CROSS:
-                self.currentPlayer = Player.CIRCLE
+            if self.currentPlayer == Tile.CROSS:
+                self.currentPlayer = Tile.CIRCLE
             else:
-                self.currentPlayer = Player.CROSS
+                self.currentPlayer = Tile.CROSS
             return Result.NEXT_MOVE, []
 
     diagonal1 = [0, 4, 8]
@@ -83,6 +83,6 @@ class Game:
     def random_player():
         i = int(random() * 2 + 1)
         if i == 1:
-            return Player.CROSS
+            return Tile.CROSS
         else:
-            return Player.CIRCLE
+            return Tile.CIRCLE
