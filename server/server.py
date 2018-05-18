@@ -4,12 +4,12 @@ from time import sleep
 
 from flask import Flask
 from flask_sockets import Sockets
-from numpy import inf
+from gevent import pywsgi
+from geventwebsocket.handler import WebSocketHandler
+from numpy.random import choice
 
 import file
 import neural
-from gevent import pywsgi
-from geventwebsocket.handler import WebSocketHandler
 from game import Game, Result, Tile
 
 app = Flask(__name__)
@@ -21,7 +21,6 @@ def game_socket(ws):
     game = None
     while not ws.closed:
         message = ws.receive()
-        print(message)
         if message == "new":
             game = Game()
             player_is = Game.random_player()
@@ -33,10 +32,9 @@ def game_socket(ws):
             ws.send(generate_message(result, game.board))
         elif game and message:
             move = int(message)
-            print("moving", move)
+            print("You play", move)
             result, lines = game.play(move)
             if result == Result.NEXT_MOVE:
-                print("computer plays")
                 result, lines = play_game(game)
             elif result == Result.WON:
                 print("finished")
@@ -56,9 +54,10 @@ def generate_message(result, board):
 def play_game(game):
     possible_moves = game.get_possible_moves()
     neural_moves = neural.play(game)
-    neural_moves = [v if i in possible_moves else -inf for (i, v) in enumerate(neural_moves)]
-    i = neural_moves.index(max(neural_moves))
-    print(i)
+    neural_moves = [v for (i, v) in enumerate(neural_moves) if i in possible_moves]
+    neural_moves /= sum(neural_moves)
+    i = choice(possible_moves, 1, p=neural_moves)[0]
+    print("computer plays", i)
     return game.play(i)
 
 
